@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CheeseMVC.ViewModels;
 using CheeseMVC.Data;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace CheeseMVC.Controllers
 {
@@ -19,14 +20,14 @@ namespace CheeseMVC.Controllers
         // GET: /<controller>/
         public IActionResult Index()
         {
-            List<Cheese> cheeses = context.Cheeses.ToList();
-
+            //List<Cheese> cheeses = context.Cheeses.ToList();
+            IList<Cheese> cheeses = context.Cheeses.Include(c => c.Category).ToList();
             return View(cheeses);
         }
-
+        [HttpPost]
         public IActionResult Add()
         {
-            AddCheeseViewModel addCheeseViewModel = new AddCheeseViewModel();
+            AddCheeseViewModel addCheeseViewModel = new AddCheeseViewModel(context.Categories.ToList());
             return View(addCheeseViewModel);
         }
 
@@ -35,12 +36,15 @@ namespace CheeseMVC.Controllers
         {
             if (ModelState.IsValid)
             {
+              CheeseCategory newCheeseCategory = context.Categories.Single(c => c.ID == addCheeseViewModel.CategoryID);
+
+
                 // Add the new cheese to my existing cheeses
                 Cheese newCheese = new Cheese
                 {
                     Name = addCheeseViewModel.Name,
                     Description = addCheeseViewModel.Description,
-                    Type = addCheeseViewModel.Type
+                    Category = newCheeseCategory
                 };
 
                 context.Cheeses.Add(newCheese);
@@ -72,5 +76,42 @@ namespace CheeseMVC.Controllers
 
             return Redirect("/");
         }
+        //default routing
+
+        public IActionResult Category(int id)
+
+        {
+
+            if (id == 0)
+
+            {
+
+                return Redirect("/Category");
+
+            }
+
+            //will retrieve a specific  category that has its cheeses list populated
+
+            //that matches a given ID passed in by the user
+
+            CheeseCategory theCategory = context.Categories
+
+                .Include(cat => cat.Cheeses)
+
+                .Single(cat => cat.ID == id);
+
+            ViewBag.title = "Cheeses in category: " + theCategory.Name;
+
+            //passes the list into the View
+
+            //wouldn't have been populated if not included above
+
+            //Cheeses is a property we already defined
+
+            return View("Index", theCategory.Cheeses);
+
+        }
+
     }
+
 }
