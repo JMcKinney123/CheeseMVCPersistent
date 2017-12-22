@@ -1,19 +1,20 @@
-﻿@model List<CheeseMVC.Models.CheeseCategory>
+﻿@model IList<CheeseMVC.Models.CheeseCategory>
 
 @{
 <ul>
-  
+    <p><a asp-controller="Category" asp-action="Add">Add Category</a></p>
+   
     @foreach (var category in Model)
     {
         <li>
-            <a asp-controller="List" asp-action="Category"></a>
+            <a asp-controller="Cheese" asp-action="Category" asp-route-id="@category.ID">@category.Name</a>
         </li>
     }
 </ul>
-<p><a asp-controller="Category" asp-action="Add">Add Category</a></p>
+
 
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
+<h2>Categories</h2>
 

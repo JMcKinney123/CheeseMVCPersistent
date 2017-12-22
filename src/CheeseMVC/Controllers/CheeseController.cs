@@ -10,11 +10,11 @@ namespace CheeseMVC.Controllers
 {
     public class CheeseController : Controller
     {
-        private CheeseDbContext context;
+        private readonly CheeseDbContext context;
 
         public CheeseController(CheeseDbContext dbContext)
         {
-            context = dbContext;
+            this.context = dbContext;
         }
 
         // GET: /<controller>/
@@ -24,7 +24,7 @@ namespace CheeseMVC.Controllers
             IList<Cheese> cheeses = context.Cheeses.Include(c => c.Category).ToList();
             return View(cheeses);
         }
-        [HttpPost]
+       
         public IActionResult Add()
         {
             AddCheeseViewModel addCheeseViewModel = new AddCheeseViewModel(context.Categories.ToList());
